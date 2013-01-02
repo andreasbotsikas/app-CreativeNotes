@@ -1,0 +1,20 @@
+.ui-icon-camera {
+	background: url("../img/camera.png") no-repeat rgba(0, 0, 0, 0.4) !important;
+}
+
+.ui-icon-text {
+	background: url("../img/text.png") no-repeat rgba(0, 0, 0, 0.4) !important;
+}
+
+.imageInput {
+	src : "img/camera.png";
+}
+
+.textInput{
+	border: none;
+	background: none;
+	width: 90%;
+	margin-left:5%;
+	padding-top:10px;
+	padding-bottom:10px;
+}

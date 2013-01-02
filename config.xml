@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget xmlns       = "http://www.w3.org/ns/widgets"
+        id          = "http://webinos.fokus.fraunhofer.de/apps/zap.wgt"
+        version     = "1.0">
+    <name short="CreativeNotes">
+    	Creative Notes
+    </name>
+
+    <description>
+    	Create and edit synchronized multimedia notes
+    </description>
+
+    <author href="http://tid.es" email="mcrg@tid.es">Telefonica I+D</author>
+
+    <icon src="webinos_Telefonica_logo2.png" />
+    <content src="index.html" />
+</widget>

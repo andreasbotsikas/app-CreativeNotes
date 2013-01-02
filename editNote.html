@@ -1,0 +1,63 @@
+
+<!DOCTYPE html> 
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<title>Edit Note</title> 
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
+	<link rel="stylesheet" href="css/style.css" />
+	<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
+	<script src="js/webinos.js"></script>
+	<script src="js/webinosManager.js"></script>
+	<script src="js/serverManager.js"></script>
+	<script src="js/dataManager.js"></script>
+	<script src="js/graphicalManager.js"></script>
+</head> 
+
+<body> 
+
+<div data-role="page">
+
+	<div data-role="header" data-theme="b">
+		<a href="index.html" data-role="button" data-icon="home" data-iconpos="notext" data-direction="reverse">Home</a>	
+		<div data-role="controlgroup" data-type="horizontal" class="ui-btn-right">
+			<a href="#" data-role="button" data-icon="camera" data-iconpos="notext" onclick ="addImage()">Add an image</a>
+			<a href="#" data-role="button" data-icon="text" data-iconpos="notext" onclick="addText()">Add text</a>
+		</div>
+		<h1>Some test note</h1>	
+	</div><!-- /header -->
+
+	<div data-role="content">	
+		<div id="noteContent">
+<!-- 			<p>
+				This is the beggining of a simple test note. Any note can contain text, images, audio and video to any note. This note can be a new plain note, or an existing note.
+			</p>
+			<p style="text-align: center">
+				<img src="img/webinos.jpg" width="300px"/>
+			</p>
+			<p>
+				Thanks to HTML5 standards, this note can be opened in any navigator that supports video and audio tags.
+			</p>
+ -->		</div>
+
+		
+		<fieldset class="ui-grid-a">
+			<div class="ui-block-a"><a href="./index.html" data-role="button" data-theme="c">Discard</a></div>
+			<div class="ui-block-b"><a href="./index.html" data-role="button" data-theme="b" onclick="saveNote(this);">Save</a></div>
+		</fieldset>
+
+<!-- Otro discard/save
+		<div data-role="controlgroup" data-type="horizontal" style="text-align: center;">
+			<a href="index.html" data-role="button" data-theme="c"data-icon="delete">Discard</a>
+			<a href="index.html" data-role="button" data-theme="a" data-icon="check">Save</a>
+		</div>
+-->
+	</div><!-- /content -->
+
+</div><!-- /page -->
+
+</body>
+</html>
