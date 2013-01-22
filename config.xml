@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <widget xmlns       = "http://www.w3.org/ns/widgets"
-        id          = "http://webinos.fokus.fraunhofer.de/apps/cn.wgt"
+        id          = "http://webinos.fokus.fraunhofer.de/apps/zap.wgt"
         version     = "1.0">
     <name short="CreativeNotes">
     	Creative Notes
