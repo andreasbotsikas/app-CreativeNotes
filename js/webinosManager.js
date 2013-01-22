@@ -1,16 +1,13 @@
 function webinosManager(){
-	// OTHER VARIABLES
 	var eventService;
 
-	// ATTRIBUTES
-
-	// METHODS
 	function getPZHName(){
 		// Name of the PZH
 		var ssid = webinos.session.getSessionId();
 		console.log("Session id: "+ssid);
 		if (ssid){
-			return (ssid.split('/')[0]);
+			var pzh = ssid.split('/')[0];
+			return (pzh);
 		} else {
 			return undefined;
 		}
@@ -32,9 +29,8 @@ function webinosManager(){
 		}
 	}
 
-	// Funciones accesibles desde fuera
 	this.getPZHName = function(){
-		getPZHName();
+		return getPZHName();
 	}
 
 	this.sendTextEvent = function(event){
@@ -63,5 +59,4 @@ function webinosManager(){
 				}})
             }}
 	);		
-	// ACTIONS
 }
