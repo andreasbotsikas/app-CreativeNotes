@@ -1,18 +1,32 @@
 function dataManager(){
-	// Public functions
+	var defaultThumb = "img/emptyNote.jpg";
+	
+	this.getDefaultThumb = function(){
+		return defaultThumb;
+	}
+
 	this.getTitle = function(note){
 		return note.title;
+	}
+
+	this.setTitle = function(note, title){
+		note.title = title;
 	}
 
 	this.getThumb = function(note){
 		return note.thumb;
 	}
 
+	this.setThumb = function(note, thumb){
+		note.thumb = thumb; 
+	}
+
 	this.getSubtitle = function (note){
 		var subtitle = "";
-		for (content in note.content){
+		for (contentIndex in note.content){
+			content = note.content[contentIndex];
 			if (content.type == "txt"){
-				subtitle = content.content;
+				subtitle = content.content + "...";
 				break;
 			}
 		}
@@ -23,13 +37,17 @@ function dataManager(){
 		return note.id;
 	}
 
+	this.setId = function (note, id){
+		note.id = id;
+	}
+
 	this.getNewNote = function(pzhName){
 		return {
-			id: '',
-			group: pzhName,
-			title: 'Untitled',
-			thumb: 'img/emptyNote.jpg',
-			content: []
+			"id": "-1",
+			"group": pzhName,
+			"title": "Untitled",
+			"thumb": defaultThumb,
+			"content": []
 		}
 	}
 
@@ -70,22 +88,22 @@ function dataManager(){
 	/* DATA MODEL OF NOTESLIST
 	[
 		{
-			id: 0,
-			group: 'WebinosTelefonica',
-			title: 'Lentil\'s Pizza',
-			thumb: 'img/thumb/1_01.jpg',
-			content: [
+			"id": 0,
+			"group": "WebinosTelefonica",
+			"title": "Lentil's Pizza",
+			"thumb": "img/thumb/1_01.jpg",
+			"content": [
 				{
-					type: 'txt',
-					content: 'First, we have to cook the lentils'
+					"type": "txt",
+					"content": "First, we have to cook the lentils"
 				},
 				{
-					type: 'img',
-					content: 'img/thumb/1_01.jpg'
+					"type": "img",
+					"content": "img/thumb/1_01.jpg"
 				},
 				{
-					type: 'txt',
-					content: 'Spread the lentils on the pizza base'
+					"type": "txt",
+					"content": "Spread the lentils on the pizza base"
 				}
 			]
 		}
