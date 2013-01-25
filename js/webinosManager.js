@@ -20,11 +20,11 @@ function webinosManager(){
 		// Test if the source of the event is this client
 		if (event.addressing.source.id == webinos.session.getSessionId()){
 			// The event has been sent by this client
-			alert("Note succesfully created/updated");
+			showAlert("Note succesfully created/updated");
 			updateNotesList();
 		} else {
 			// The event has been sent by another PZP
-			alert(event.addressing.source.id.split('/')[1] + " has sent a new/updated note");
+			showAlert(event.addressing.source.id.split('/')[1] + " has sent a new/updated note");
 			dataMgr.addNote(event.payload, serverMgr.getNotes());
 		}
 	}
@@ -55,7 +55,7 @@ function webinosManager(){
 					console.log("APP ID: "+ser.myAppID);
 					console.log(variable);
 					ser.addWebinosEventListener(eventReceived);
-					alert("Succesfully connected to Webinos PZH: "+getPZHName());
+					showAlert("Succesfully connected to Webinos PZH: "+getPZHName());
 				}})
             }}
 	);		

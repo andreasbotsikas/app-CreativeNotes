@@ -33,14 +33,18 @@ function saveNote(){
 	var noteData = new Array ();
 
 	$.each($(".imageInput"), function (){
-		imagesURLs.push(img_server+"/"+img_folder+this.files[0].name);
-		result.push("NULL");
+		if (this.files[0]){
+			imagesURLs.push(img_server+"/"+img_folder+this.files[0].name);
+			result.push("NULL");
+		}
 	});
 	
 	$.each($(".imageInput"), function (imageIndex){
-		console.log("Uploading Image"); 
-		serverMgr.uploadImage(result,imageIndex,this.files[0]); 
-		imageIndex++;
+		if (this.files[0]){
+			console.log("Uploading Image"); 
+			serverMgr.uploadImage(result,imageIndex,this.files[0]); 
+			imageIndex++;
+		}
 	});
 	
 	var interval = window.setInterval(function(){
@@ -303,7 +307,7 @@ function initEdit(){
 			if (content.type == "txt"){
 				noteContent.append("<p>"+content.content+"</p>");
 			} else if (content.type == "img"){
-				noteContent.append('<p style="text-align: center"><img src="' + content.content + '" alt="" /></p>');
+				noteContent.append('<p style="text-align: center"><img src="' + content.content + '" alt="" width="95%" /></p>');
 			}
 		}
 	}
@@ -335,7 +339,10 @@ var setTitle = function(title){
 }
 
 var showAlert = function(text){
-		alert(text);
+	var notificationArea = $(".notificationArea");
+	notificationArea.show('fast');
+	notificationArea.html(text);
+	notificationArea.delay(3000).hide('fast');
 };
 
 // If webinos is not present use only initinterface();

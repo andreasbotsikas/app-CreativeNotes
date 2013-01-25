@@ -9,7 +9,7 @@ function serverManager(){
 			notesRetrieved = JSON.parse(xmlhttp.responseText);
 			return (notesRetrieved);
 		} catch (e){
-			alert("The serves is unresponsive or data malformed");
+			showAlert("The serves is unresponsive or data malformed");
 			return (notesList);
 		}
 	}
@@ -22,7 +22,7 @@ function serverManager(){
 			var note = JSON.parse(xmlhttp.responseText);
 			return (note);
 		} catch (e){
-			alert("The serves is unresponsive or data malformed");
+			showAlert("The serves is unresponsive or data malformed");
 			console.log(xmlhttp.responseText);
 			return (-1);
 		}
