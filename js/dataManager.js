@@ -75,14 +75,17 @@ function dataManager(){
 	this.addNote = function (note, notesList){
 		console.log("Add Note");
 		console.log(note);
-		// Test if the note exits:
-		if (this.getNoteById(note.id, serverMgr.getNotes()) == -1){
+		// Test if the note exits in notesList:
+		if (this.getNoteById(note.id, notesList) == -1){
 			// NEW NOTE
 			notesList.push(note);
 		} else {
 			// UPDATED NOTE
 			notesList[this.getNoteIndexById(note.id, notesList)] = note;
 		}
+
+		// Update the list of notes
+		updateNotesList();
 	}
 
 	/* DATA MODEL OF NOTESLIST

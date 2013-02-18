@@ -35,18 +35,24 @@ function serverManager(){
 			data.append('file',file);
 
 			xmlhttp = new XMLHttpRequest(); 
+
+			// This has to be fixed, now it only returns DONE, because it doesn't wait
+			// for result [index] to be written
 			xmlhttp.onreadystatechange = function() {
 				if (xmlhttp.readyState==4 && xmlhttp.status==200){
+					console.log("Answer of the server:");
+					console.log(xmlhttp.responseText); 
 			    	result[index] = ("DONE");
 				} else {
-					result[index]=("FAIL");
+					result[index]=("DONE");
 				}
 			};
   			xmlhttp.open("POST", "http://195.235.93.35/webinos/saveMedia", true); 
 			xmlhttp.send(data);
 
-			console.log("Answer of the server:");
-			console.log(xmlhttp.response); 
+			// Cause graphicalManager does not wait, return always DONE
+	    	result[index] = ("DONE");
+
 		}
 	}
 

@@ -5,6 +5,7 @@ var notesList;
 var currentNote;
 var popupTitleOpened = false;
 var defaultUntitledTitle = "Untitled Note";
+var noteWidth = "95%";
 // Show a spinning wheel while testing everything
 
 var defaultGroup = "WebinosTelefonica"
@@ -46,6 +47,9 @@ function saveNote(){
 			imageIndex++;
 		}
 	});
+
+	// In mobile, $(".noteDataItem") is not present when looking for them:
+	var noteDataItems = $(".noteDataItem");
 	
 	var interval = window.setInterval(function(){
 		var loop = true;
@@ -64,7 +68,7 @@ function saveNote(){
 
 			imageIndex = 0;
 
-			$.each($(".noteDataItem"), function (){
+			$.each(noteDataItems, function (){
 				if ($(this).is('.textInput')){
 					noteData.push (
 						{
@@ -151,10 +155,22 @@ function addImage(){
 	var row = "";
 
 	row += "<p style='text-align:center'>";
-	row += 		"<input type='file' class='noteDataItem imageInput' name='image'/>";
+	row += 		"<input type='file' class='noteDataItem imageInput' accept='image/*;capture=camera' name='image'/>";
 	row += "</p>";
 	
 	$("#noteContent").append(row);	
+
+	// Append dynamic image preview with FileAPI
+	if (window.FileReader){
+		$(".imageInput:last").change(function(){
+			// Gets dataURL, and when ready show the image
+			readFileAsDataURL(this.files[0]);
+
+			// Hide paragraph including input
+			this.parentElement.hidden = true;
+		});
+	}
+
 	$(".imageInput:last").click();
 }
 
@@ -307,7 +323,8 @@ function initEdit(){
 			if (content.type == "txt"){
 				noteContent.append("<p>"+content.content+"</p>");
 			} else if (content.type == "img"){
-				noteContent.append('<p style="text-align: center"><img src="' + content.content + '" alt="" width="95%" /></p>');
+				noteContent.append('<p style="text-align: center"><img src="' + content.content + 
+					'" alt="" width="'+ noteWidth +'" /></p>');
 			}
 		}
 	}
@@ -336,6 +353,7 @@ var askTitle = function(mode){
 var setTitle = function(title){
 	$("#noteTitle")[0].innerHTML = title;
 	dataMgr.setTitle(currentNote, title);
+	updateNotesList();
 }
 
 var showAlert = function(text){
@@ -393,3 +411,18 @@ $(document).bind( 'pageinit', function(event){
 	console.log("PageInit fired");
 	console.log(event);
 });
+
+// FILE API
+function readFileAsDataURL(file){
+	var reader = new FileReader();
+	reader.readAsDataURL(file);
+	reader.onload = function(event){
+		// Show the image
+		$("#noteContent").append('<p style="text-align: center"><img src="' + event.target.result + 
+				'" alt="" width="'+ noteWidth +'" /></p>');
+
+	};
+	reader.onerror = function(){
+		console.log("Error loading file for showing");
+	}
+}

@@ -25,7 +25,7 @@ function webinosManager(){
 		} else {
 			// The event has been sent by another PZP
 			showAlert(event.addressing.source.id.split('/')[1] + " has sent a new/updated note");
-			dataMgr.addNote(event.payload, serverMgr.getNotes());
+			dataMgr.addNote(event.payload, notesList);
 		}
 	}
 
