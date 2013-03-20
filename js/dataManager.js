@@ -86,6 +86,8 @@ function dataManager(){
 
 		// Update the list of notes
 		updateNotesList();
+
+		fileMgr.writeNotesList(notesList);
 	}
 
 	/* DATA MODEL OF NOTESLIST

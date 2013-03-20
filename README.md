@@ -1,9 +1,11 @@
-## app-CreativeNotes
+## Creative Notes
 =================
+**NOTE: This Creative Notes version works on Webinos platform until 0.8.0**
 
 ### Installing
 
 Currently, Creative Notes can be run in two ways:
+
 1. Using Webinos PZP webserver.
 2. Using Webinos Widget Renderer Tool (WRT). 
 

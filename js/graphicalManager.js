@@ -1,6 +1,7 @@
 var webinosMgr;
 var serverMgr;
 var dataMgr;
+var fileMgr;
 var notesList;
 var currentNote;
 var popupTitleOpened = false;
@@ -9,6 +10,10 @@ var noteWidth = "95%";
 // Show a spinning wheel while testing everything
 
 var defaultGroup = "WebinosTelefonica"
+
+var pzhName;
+
+var noteIdLength = 32;
 
 var img_server = "http://195.235.93.35";
 var img_folder = "static/";
@@ -91,42 +96,25 @@ function saveNote(){
 			console.log ("Note Data:: ");
 			console.log (noteData);
 			currentNote.content = currentNote.content.concat(noteData);
-			tmpId = serverMgr.sendNote(currentNote);
-			try {
-				// First, test if the server has answer rightly.
-				id = parseInt(tmpId);
-				// Append the note to the list if new note
-				if (dataMgr.getId(currentNote) == -1){
-					dataMgr.setId(currentNote, id);
+			
+			// Just for backup
+			serverMgr.sendNote(currentNote);
 
-					notesList.push(currentNote);
-					var title = dataMgr.getTitle(currentNote);
-					var thumb = dataMgr.getThumb(currentNote);
-					var subtitle = dataMgr.getSubtitle(currentNote);
-					$("#notesList").append('<li><a href="editNote.html?id='+id+'">\
-								<img src="'+ thumb +'" />\
-								<h3>'+ title +'</h3>\
-								<p>'+ subtitle +'</p>\
-							</a></li>'
-					);
-					$("#notesList").listview('refresh');
-				} else {
-					// If existing note
-					updateNotesList();
-				}
-			} catch(err) {			
-				console.log("Error while sending note to backend:");
-				console.log("Server response:");
-				console.log(tmpId);
-				console.log(err);
+			// If new note
+			if (dataMgr.getId(currentNote) == -1){
+
+				// Generate a new random ID, and assign to the current note.
+				dataMgr.setId(currentNote, randomString(noteIdLength));
 			}
 
-			// Send though webinos anyway (it doesn't )
-			webinosMgr.sendTextEvent(currentNote);
+			// This will add the note to notesList, refresh view and write notesList to File
+			dataMgr.addNote(currentNote, notesList);
+
+			// Send though webinos
+			webinosMgr.sendNoteEvent(currentNote);
 		}
 	}, 100);
 
-	// Then, send the webinos event
 }
 
 function updateNotesList(){
@@ -230,7 +218,6 @@ function waitWebinosPZHAndRunFunction(funcion) {
 	// First, wait webinos to load completely to get a right PZHId
 	if (webinos.session.getSessionId()){
 		// If webinos is already loaded
-		console.log("SessionID of webinos loaded");
 		runFunction(funcion);
 	} else {
 		// Wait until webinos is loaded
@@ -238,8 +225,7 @@ function waitWebinosPZHAndRunFunction(funcion) {
 			if (webinos.session.getSessionId()){
 				// sessionId detected
 				window.clearInterval(interval);
-
-				console.log("SessionID of webinos loaded");
+				pzhName = webinosMgr.getPZHName();
 				runFunction(funcion);
 				console.log("A wait has been necessary to load sessionId");
 			}
@@ -253,24 +239,42 @@ function waitWebinosPZHAndRunFunction(funcion) {
 function initIndex(){
 
 	if (!notesList){
-		// Get notesList from the server.
-		notesList = serverMgr.getNotes(webinosMgr.getPZHName());
+		// First, try to get notes from the local file. If something bad happens, download/ask
 
-		// Fill the interface with the notes retrieved.
-		for (var noteIndex in notesList){
-			var note = notesList[noteIndex];
-			var title = dataMgr.getTitle(note);
-			var thumb = dataMgr.getThumb(note);
-			var subtitle = dataMgr.getSubtitle(note);
-			var id = dataMgr.getId(note);
-			$("#notesList").append('<li><a href="editNote.html?id='+id+'">\
-						<img src="'+ thumb +'" />\
-						<h3>'+ title +'</h3>\
-						<p>'+ subtitle +'</p>\
-					</a></li>\
-				');
+		// If fileAPI is not ready, there is no file, or it's corrupted
+		var errorCB = function(error){
+			// Override InvalidStateError
+			if (!error || error.name != "InvalidStateError"){			
+				// Get a list of notes from other PZP through webinos
+				webinosMgr.getNotesFromOtherPZP(
+					function(notes){
+						console.log("NOTES RETRIEVED FROM OTHER PZP");
+						notesList = notes;
+						fileMgr.writeNotesList(notesList);
+						updateNotesList();
+					}
+				)
+			}
 		}
-		$("#notesList").listview('refresh');
+
+		// If fileAPI is ready
+		var successCB = function(){
+
+			// If the file has been read
+			var gotNotesList = function(nl){
+				notesList = nl;
+				updateNotesList();
+			}
+
+			// If there is no file to read, same actions as fileAPI not ready.
+
+			fileMgr.readNotesList(gotNotesList, errorCB);
+
+		}
+
+		// Initialize fileManager, and when ready, try to read notes.
+		fileMgr = new fileManager(successCB, errorCB);
+
 	}
 }
 
@@ -292,7 +296,6 @@ function initEdit(){
 		
 		// New note
 		console.log("CreateNewNote");
-		var pzhName = webinosMgr.getPZHName();
 		currentNote = dataMgr.getNewNote(pzhName);
 		askTitle("blank");
 	} else {
@@ -385,7 +388,7 @@ if ("webinos" in window){
 	console.log(interval);
 }
 
-// This event will be fired every time a page has been loaded, no matters if it's cached or if it doesn't
+// This event will be fired every time a page has been loaded, it doesn't matter if it's cached or if it doesn't
 $(document).bind( 'pagechange', function(event){
 	$.mobile.loading('show');
 	console.log("fired PageChange");
@@ -415,14 +418,32 @@ $(document).bind( 'pageinit', function(event){
 // FILE API
 function readFileAsDataURL(file){
 	var reader = new FileReader();
-	reader.readAsDataURL(file);
 	reader.onload = function(event){
 		// Show the image
 		$("#noteContent").append('<p style="text-align: center"><img src="' + event.target.result + 
 				'" alt="" width="'+ noteWidth +'" /></p>');
 
 	};
+
 	reader.onerror = function(){
 		console.log("Error loading file for showing");
 	}
+
+	reader.readAsDataURL(file);
+
+}
+
+// Generates a random string
+function randomString(length) {
+    var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz'.split('');
+
+    if (! length) {
+        length = Math.floor(Math.random() * chars.length);
+    }
+
+    var str = '';
+    for (var i = 0; i < length; i++) {
+        str += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return str;
 }

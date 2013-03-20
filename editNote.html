@@ -13,10 +13,11 @@
 	<!-- Weinre loading for testing purpouses:-->
 	<!--<script src="http://192.168.43.238:8009/target/target-script-min.js"></script>-->
 	<!---->
-	<script src="/client/webinos.js"></script>
+	<script src="/webinos.js"></script>
 	<script src="js/webinosManager.js"></script>
 	<script src="js/serverManager.js"></script>
 	<script src="js/dataManager.js"></script>
+	<script src="js/fileManager.js"></script>
 	<script src="js/graphicalManager.js"></script>
 </head> 
 
@@ -24,7 +25,7 @@
 
 <div data-role="page">
 
-	<div data-role="header" data-theme="b">
+	<div data-role="header" data-theme="b" data-position="fixed">
 		<a href="index.html" data-role="button" data-icon="home" data-iconpos="notext" data-direction="reverse">Home</a>	
 		<div data-role="controlgroup" data-type="horizontal" class="ui-btn-right">
 			<a href="#" data-role="button" data-icon="camera" data-iconpos="notext" onclick ="addImage()">Add an image</a>

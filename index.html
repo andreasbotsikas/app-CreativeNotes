@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1"> 
-	<title>List of Notes</title> 
+	<title>Creative Notes</title> 
 	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
 	<link rel="stylesheet" href="css/style.css" />
 	<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
@@ -13,10 +13,11 @@
 	<!-- Weinre loading for testing purpouses:-->
 	<!--<script src="http://192.168.43.238:8009/target/target-script-min.js"></script>-->
 	<!---->
-	<script src="/client/webinos.js"></script>
+	<script src="/webinos.js"></script>
 	<script src="js/webinosManager.js"></script>
 	<script src="js/serverManager.js"></script>
 	<script src="js/dataManager.js"></script>
+	<script src="js/fileManager.js"></script>
 	<script src="js/graphicalManager.js"></script>
 </head> 
 
@@ -24,10 +25,10 @@
 
 <div data-role="page">
 
-	<div data-role="header" data-theme="b">
+	<div data-role="header" data-theme="b" data-position="fixed">
 		<a href="index.html" data-icon="home" data-iconpos="notext" data-direction="reverse">Home</a>
 		<a href="editNote.html?id=blank" data-icon="plus" data-iconpos="notext" class="ui-btn-right">Add</a>
-		<h1>List of notes</h1>	
+		<h1>Creative Notes</h1>	
 	</div><!-- /header -->
 
 	<div class="notificationArea">
