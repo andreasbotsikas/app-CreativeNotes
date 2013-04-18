@@ -74,7 +74,7 @@ function webinosManager(){
 				case "cn-getNotes":
 					// Do nothing, we are asking for notes, we don't have notes.
 					break;
-				case "cn-sendNotes":
+				case "cn-updatedNote":
 					// The event has been sent by this client
 					showAlert("Note succesfully created/updated");
 					break;
@@ -86,7 +86,7 @@ function webinosManager(){
 					// Someone is asking for notesList
 					sendGetNotesResponseEvent(event);
 					break;
-				case "cn-sendNotes":
+				case "cn-updatedNote":
 					// Someone has send a new or updated note
 					showAlert(event.addressing.source.id.split('/')[1] + " has sent a new or updated note");
 					dataMgr.addNote(event.payload, notesList);

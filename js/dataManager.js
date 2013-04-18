@@ -70,6 +70,9 @@ function dataManager(){
 				return noteIndex;
 			}
 		}
+
+		// Ends iteration, not found
+		return -1;
 	}
 
 	this.addNote = function (note, notesList){
@@ -88,6 +91,64 @@ function dataManager(){
 		updateNotesList();
 
 		fileMgr.writeNotesList(notesList);
+	}
+
+	/***
+	Use SugarJS to work with sets
+	***/
+	this.mixNotesList = function(localNotesList, remoteNotesList){
+		var notesList1 = localNotesList;
+		var notesList2 = remoteNotesList;
+
+		// Function that mixes two notes with the same id and changes in both.
+		var mixNotes = function(localNote, remoteNote){
+		  var note = localNote;
+		  var note2 = remoteNote;
+		  var onlyLocalContent = note.content.subtract(note2.content); // [] if only remote changes
+		  var onlyRemoteContent = note2.content.subtract(note.content); // [] if only local changes
+		  if (onlyLocalContent.length == 0){
+		    // The note has not been updated locally, only remotely
+		    note.content = note2.content;
+		    console.log("Note modified in remote, update only in local");
+		    dataMgr.addNote(note, notesList);
+		  } else if (onlyRemoteContent.length == 0){
+		    // The note only has local updates
+		    console.log("Note modified in local, send webinos event");
+		    webinosMgr.sendNoteEvent(note);
+		  } else {
+		    console.log("Note modified in both sides, send webinos event");
+		    note.content = note.content.union(note2.content);
+		    webinosMgr.sendNoteEvent(note);
+		  }
+		  console.log(note);
+		  console.log(note2);
+		}
+
+		var modifiedLocalNotes = notesList1.subtract(notesList2);
+		var modifiedRemoteNotes = notesList2.subtract(notesList1);
+
+		for (noteI in modifiedLocalNotes){
+		  var note = modifiedLocalNotes[noteI];
+		  if (dataMgr.getNoteById(note.id, modifiedRemoteNotes) == -1){
+		    // Inexistent note in remote. Brand new local note
+		    console.log("New local note, send webinos event");
+		    webinosMgr.sendNoteEvent(note);
+		  } else {
+		    // Modified in both sides
+		    console.log("Updated note: Mix local and remote notes");
+		    var note2 = dataMgr.getNoteById(note.id, notesList2);
+		    mixNotes(note, note2);
+		  }
+		}
+
+		for (noteI in modifiedRemoteNotes){
+		  var note = modifiedRemoteNotes[noteI];
+		  if (dataMgr.getNoteById(note.id, modifiedLocalNotes) == -1){
+		    // Inexistent note in local. Brand new remote note
+		    console.log("New remote note, add it locally");
+		    dataMgr.addNote(note, notesList);
+		  }
+		}
 	}
 
 	/* DATA MODEL OF NOTESLIST

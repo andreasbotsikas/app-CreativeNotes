@@ -1,6 +1,5 @@
 ## Creative Notes
 =================
-**NOTE: This Creative Notes version works on Webinos platform until 0.8.0**
 
 ### Installing
 

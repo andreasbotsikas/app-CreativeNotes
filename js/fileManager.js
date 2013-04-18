@@ -1,6 +1,7 @@
 function fileManager(successCB, errorCB){
 	var fileService;
 	var fileSystem;
+	var otherFileServices = [];
 
 	var notesListFileName = "CreativeNotes.json";
 
@@ -11,9 +12,17 @@ function fileManager(successCB, errorCB){
 	function errorWithCB(log){
 		console.log(log);
 		errorCB(log);
-	}
+	}  
 
 	function onServiceFound(ser){
+		// Test if it's fileAPI from another PZP
+		if (ser.serviceAddress != webinos.session.getPZPId()){
+			// Add it to otherPZP list, to otherFileServices and exit (we do not bind at the moment)
+			otherPZP.push(ser.serviceAddress);
+			otherFileServices.push(ser);
+			return;
+		}
+
 		fileService = ser;
 		ser.bindService({
 			onBind: function(){

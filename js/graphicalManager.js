@@ -9,9 +9,10 @@ var defaultUntitledTitle = "Untitled Note";
 var noteWidth = "95%";
 // Show a spinning wheel while testing everything
 
-var defaultGroup = "WebinosTelefonica"
+var defaultGroup = "WebinosTelefonica";
 
 var pzhName;
+var otherPZP = []; // Filled when searching fileAPI services (fileManager.js)
 
 var noteIdLength = 32;
 
@@ -98,7 +99,7 @@ function saveNote(){
 			currentNote.content = currentNote.content.concat(noteData);
 			
 			// Just for backup
-			serverMgr.sendNote(currentNote);
+			// serverMgr.sendNote(currentNote);
 
 			// If new note
 			if (dataMgr.getId(currentNote) == -1){
@@ -241,20 +242,21 @@ function initIndex(){
 	if (!notesList){
 		// First, try to get notes from the local file. If something bad happens, download/ask
 
-		// If fileAPI is not ready, there is no file, or it's corrupted
+		// If fileAPI is not ready (or not supported), there is no file, or it's corrupted
 		var errorCB = function(error){
-			// Override InvalidStateError
-			if (!error || error.name != "InvalidStateError"){			
-				// Get a list of notes from other PZP through webinos
-				webinosMgr.getNotesFromOtherPZP(
-					function(notes){
+			// Get a list of notes from other PZP through webinos
+			webinosMgr.getNotesFromOtherPZP(
+				function(notes){
+					// This function can be called more than one time (various responses)
+					// Test if notesList has been already loaded
+					if (!notesList){
 						console.log("NOTES RETRIEVED FROM OTHER PZP");
 						notesList = notes;
 						fileMgr.writeNotesList(notesList);
 						updateNotesList();
 					}
-				)
-			}
+				}
+			)
 		}
 
 		// If fileAPI is ready
@@ -264,10 +266,20 @@ function initIndex(){
 			var gotNotesList = function(nl){
 				notesList = nl;
 				updateNotesList();
+
+				// Now retrieve remote NotesList, and look for changes
+				var gotRemoteNL = false;
+				webinosMgr.getNotesFromOtherPZP(
+					function(remoteNotesList){
+						if (!gotRemoteNL){
+							gotRemoteNL = true;
+							dataMgr.mixNotesList(notesList, remoteNotesList);
+						}
+					}
+				);
 			}
 
 			// If there is no file to read, same actions as fileAPI not ready.
-
 			fileMgr.readNotesList(gotNotesList, errorCB);
 
 		}
