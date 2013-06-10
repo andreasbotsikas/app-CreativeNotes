@@ -1,6 +1,10 @@
 ## Creative Notes
 =================
 
+### Initial considerations
+
+At the moment, this version only works on PC due to FileAPI compatibility. To make it work on both PC and Android, you have to install [91715551d1](https://github.com/webinos/app-CreativeNotes/commit/91715551d1db04fabed93589d63ddd672d32f38a) on EVERY device.
+
 ### Installing
 
 Currently, Creative Notes can be run in two ways:

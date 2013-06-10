@@ -1,5 +1,4 @@
 var webinosMgr;
-var serverMgr;
 var dataMgr;
 var fileMgr;
 var notesList;
@@ -16,9 +15,6 @@ var otherPZP = []; // Filled when searching fileAPI services (fileManager.js)
 
 var noteIdLength = 32;
 
-var img_server = "http://195.235.93.35";
-var img_folder = "static/";
-
 // Now, the pages are static HTML, so we can wait to load webinos after painting the interface and handle the messages. 
 // In the first try (demo), the waiting for webinos will be inside $(document).bind(pageinit). 
 // In the future, first we have to load webinos, and when ready we'll get notes and after paint the interface.
@@ -27,117 +23,74 @@ var img_folder = "static/";
 function initInterface(){
 	// graphicalManager tendrá las funciones directamente
 	webinosMgr = new webinosManager();
-	serverMgr = new serverManager();
 	dataMgr = new dataManager();
 }
 
-// CARLOS
 function saveNote(){
-	// Actually get content of the note and send to the server
-	var imagesURLs = new Array();
-	var result = new Array();
-	var imageIndex = 0;
-	var noteData = new Array ();
+	imgInput = $(".imageInput");
+	for (var imgIndex=0; imgIndex<imgInput.length; imgIndex++){
+		fileMgr.saveImg(imgInput[imgIndex].files[0]);
+		fileMgr.sendImg(imgInput[imgIndex].files[0]);
+	}
 
-	$.each($(".imageInput"), function (){
-		if (this.files[0]){
-			imagesURLs.push(img_server+"/"+img_folder+this.files[0].name);
-			result.push("NULL");
-		}
-	});
-	
-	$.each($(".imageInput"), function (imageIndex){
-		if (this.files[0]){
-			console.log("Uploading Image"); 
-			serverMgr.uploadImage(result,imageIndex,this.files[0]); 
-			imageIndex++;
-		}
-	});
-
-	// In mobile, $(".noteDataItem") is not present when looking for them:
 	var noteDataItems = $(".noteDataItem");
-	
-	var interval = window.setInterval(function(){
-		var loop = true;
-		$.each(result, function (){
-			loop = false; 
-			if(this == "NULL") 
-				loop = true;
-		});
+	noteData = [];
 
-		if (result.length == 0) 
-			loop = false;
-
-		if (!loop){
-			window.clearInterval(interval);
-			console.log ("Images Uploaded");
-
-			imageIndex = 0;
-
-			$.each(noteDataItems, function (){
-				if ($(this).is('.textInput')){
-					noteData.push (
-						{
-							"type":"txt",
-							"content":this.value
-						}
-					);
-				} else {
-					noteData.push (
-						{
-							"type":"img",
-							"content":imagesURLs[imageIndex]
-						}
-					);
-					if (currentNote.thumb == dataMgr.getDefaultThumb())
-						dataMgr.setThumb(currentNote, imagesURLs[imageIndex]);
-					imageIndex++;
-				}
-			});
-			console.log ("Note Data:: ");
-			console.log (noteData);
-			currentNote.content = currentNote.content.concat(noteData);
-			
-			// Just for backup
-			// serverMgr.sendNote(currentNote);
-
-			// If new note
-			if (dataMgr.getId(currentNote) == -1){
-
-				// Generate a new random ID, and assign to the current note.
-				dataMgr.setId(currentNote, randomString(noteIdLength));
-			}
-
-			// This will add the note to notesList, refresh view and write notesList to File
-			dataMgr.addNote(currentNote, notesList);
-
-			// Send though webinos
-			webinosMgr.sendNoteEvent(currentNote);
+	for (var dataIndex=0; dataIndex<noteDataItems.length; dataIndex++){
+		if (noteDataItems[dataIndex].classList.contains("imageInput")){
+			noteData.push({
+					"type":"img",
+					"content": noteDataItems[dataIndex].files[0].name
+				});
+			if (currentNote.thumb == dataMgr.getDefaultThumb())
+				dataMgr.setThumb(currentNote, noteDataItems[dataIndex].files[0].name);
+		} else if (noteDataItems[dataIndex].classList.contains("textInput")){
+			noteData.push({
+					"type":"txt",
+					"content": noteDataItems[dataIndex].value
+				});
 		}
-	}, 100);
+	}
 
+	currentNote.content = currentNote.content.concat(noteData);
+	// If new note
+	if (dataMgr.getId(currentNote) == -1){
+		// Generate a new random ID, and assign to the current note.
+		dataMgr.setId(currentNote, randomString(noteIdLength));
+	}
+	// This will add the note to notesList, refresh view and write notesList to File
+	dataMgr.addNote(currentNote, notesList);
+	// Send though webinos
+	webinosMgr.sendNoteEvent(currentNote);
 }
+
 
 function updateNotesList(){
 	var currentPage = getCurrentPage();
-	if (currentPage.split("?")[0] == "index.html"){
-		$("#notesList").html("");
-		for (var noteIndex in notesList){
-			var note = notesList[noteIndex];
-			var title = dataMgr.getTitle(note);
-			var thumb = dataMgr.getThumb(note);
-			var subtitle = dataMgr.getSubtitle(note);
-			var id = dataMgr.getId(note);
-			$("#notesList").append('<li><a href="editNote.html?id='+id+'">\
-						<img src="'+ thumb +'" />\
-						<h3>'+ title +'</h3>\
-						<p>'+ subtitle +'</p>\
-					</a></li>\
-				');
-		}
-		$("#notesList").listview('refresh');
+	$("#notesList").html("");
+	for (var noteIndex in notesList){
+		var note = notesList[noteIndex];
+		var title = dataMgr.getTitle(note);
+		var thumb = dataMgr.getThumb(note);
+		var subtitle = dataMgr.getSubtitle(note);
+		var id = dataMgr.getId(note);
+		$("#notesList").append('<li><a href="editNote.html?id='+id+'">\
+					<img id="'+ thumb +'" />\
+					<h3>'+ title +'</h3>\
+					<p>'+ subtitle +'</p>\
+				</a></li>\
+			');
 
+		// Add local images
+		fileMgr.readLocalImg(thumb, function(data, name){
+			imgs = $("img[id='"+ name +"']");
+			for (imgIndex in imgs){
+				imgs[imgIndex].src = data;
+			}
+		});	
 	}
+	$("#notesList").listview('refresh');
+
 }
 
 function addImage(){
@@ -313,7 +266,7 @@ function initEdit(){
 	} else {
 		if (!notesList){
 			// editNote.html has been loaded before index.html (not possible in WRT)
-			currentNote = serverMgr.getSingleNote(idParameter);
+			alert("Load first index.html");
 		} else {
 			// notesList loaded in the past
 			if (popupTitleOpened){
@@ -338,8 +291,14 @@ function initEdit(){
 			if (content.type == "txt"){
 				noteContent.append("<p>"+content.content+"</p>");
 			} else if (content.type == "img"){
-				noteContent.append('<p style="text-align: center"><img src="' + content.content + 
+				noteContent.append('<p style="text-align: center"><img id="' + content.content + 
 					'" alt="" width="'+ noteWidth +'" /></p>');
+				fileMgr.readLocalImg(content.content, function(data, name){
+					imgs = $("img[id='"+ name +"']");
+					for (imgIndex in imgs){
+						imgs[imgIndex].src = data;
+					}
+				})
 			}
 		}
 	}
